@@ -8,7 +8,8 @@ const ProfileCard = ({
   email, 
   phone, 
   imageUrl, 
-  funFact 
+  funFact,
+  status = 'Active' // Default to active if not provided
 }) => {
   const [showFunFact, setShowFunFact] = useState(false);
 
@@ -31,6 +32,12 @@ const ProfileCard = ({
       </div>
       
       <div className="profile-content">
+        <div className="profile-badges">
+          <span className={`profile-status-badge status-${status.toLowerCase()}`}>
+            {status}
+          </span>
+        </div>
+
         <h3 className="profile-name">{name}</h3>
         <p className="profile-role">{role}</p>
         <span className="profile-department">{department}</span>

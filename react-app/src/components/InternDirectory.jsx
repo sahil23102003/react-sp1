@@ -4,6 +4,9 @@ import InternForm from './InternForm';
 import InternTable from './InternTable';
 import InternDetail from './InternDetail';
 import InternReports from './InternReports';
+import ProjectList from './ProjectList';
+import ProjectForm from './ProjectForm';
+import ProjectDetail from './ProjectDetail'; 
 import { fetchInterns } from '../services/api';
 import './InternDirectory.css';
 
@@ -11,9 +14,11 @@ const InternDirectory = () => {
   const [interns, setInterns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState('cards'); // 'cards', 'table', or 'reports'
+  const [viewMode, setViewMode] = useState('cards'); // 'cards', 'table', 'reports', or 'projects'
   const [showForm, setShowForm] = useState(false);
+  const [showProjectForm, setShowProjectForm] = useState(false);
   const [selectedInternId, setSelectedInternId] = useState(null);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   const loadInterns = async () => {
     try {
@@ -52,6 +57,13 @@ const InternDirectory = () => {
     setShowForm(false);
   };
 
+  const handleProjectAdded = (newProject) => {
+    // Hide the form after successful addition
+    setShowProjectForm(false);
+    // Auto-switch to project view to show the new project
+    setViewMode('projects');
+  };
+
   const handleInternDeleted = (deletedId) => {
     // Refresh the intern list
     loadInterns();
@@ -61,23 +73,62 @@ const InternDirectory = () => {
     setSelectedInternId(internId);
   };
 
+  const handleProjectSelected = (projectId) => {
+    setSelectedProjectId(projectId);
+  };
+
   const handleCloseDetail = () => {
     setSelectedInternId(null);
     // Refresh data when detail view is closed (in case updates were made)
     loadInterns();
   };
 
+  const handleCloseProjectDetail = () => {
+    setSelectedProjectId(null);
+  };
+
   const toggleViewMode = (mode) => {
-    // When changing view mode, hide the form
+    // When changing view mode, hide all forms
     setShowForm(false);
+    setShowProjectForm(false);
     setViewMode(mode);
   };
 
   const toggleForm = () => {
     setShowForm(!showForm);
+    setShowProjectForm(false); // Close project form if open
+    
     // If showing form, ensure we're in cards/table view, not reports
-    if (!showForm && viewMode === 'reports') {
+    if (!showForm && (viewMode === 'reports' || viewMode === 'projects')) {
       setViewMode('cards');
+    }
+  };
+
+  const toggleProjectForm = () => {
+    setShowProjectForm(!showProjectForm);
+    setShowForm(false); // Close intern form if open
+    
+    // If showing form, ensure we're in projects view
+    if (!showProjectForm && viewMode !== 'projects') {
+      setViewMode('projects');
+    }
+  };
+
+  // Determine what button label should be shown based on current view
+  const getAddButtonLabel = () => {
+    if (viewMode === 'projects') {
+      return showProjectForm ? 'Hide Project Form' : 'Add New Project';
+    } else {
+      return showForm ? 'Hide Form' : 'Add New Intern';
+    }
+  };
+  
+  // Determine which add button action to perform
+  const handleAddButtonClick = () => {
+    if (viewMode === 'projects') {
+      toggleProjectForm();
+    } else {
+      toggleForm();
     }
   };
 
@@ -89,8 +140,8 @@ const InternDirectory = () => {
             Refresh Data
           </button>
           
-          <button className="toggle-form-button" onClick={toggleForm}>
-            {showForm ? 'Hide Form' : 'Add New Intern'}
+          <button className="toggle-form-button" onClick={handleAddButtonClick}>
+            {getAddButtonLabel()}
           </button>
         </div>
 
@@ -113,11 +164,21 @@ const InternDirectory = () => {
           >
             Reports
           </button>
+          <button 
+            className={`view-toggle-btn ${viewMode === 'projects' ? 'active' : ''}`}
+            onClick={() => toggleViewMode('projects')}
+          >
+            Projects
+          </button>
         </div>
       </div>
       
       {showForm && (
         <InternForm onInternAdded={handleInternAdded} />
+      )}
+      
+      {showProjectForm && (
+        <ProjectForm onProjectAdded={handleProjectAdded} />
       )}
       
       {error && (
@@ -126,10 +187,12 @@ const InternDirectory = () => {
         </div>
       )}
       
-      {!showForm && !loading && (
+      {!showForm && !showProjectForm && !loading && (
         <>
           {viewMode === 'reports' ? (
             <InternReports />
+          ) : viewMode === 'projects' ? (
+            <ProjectList onProjectSelected={handleProjectSelected} />
           ) : viewMode === 'table' ? (
             <InternTable 
               interns={interns} 
@@ -149,6 +212,7 @@ const InternDirectory = () => {
                     phone={intern.phone}
                     imageUrl={intern.imageUrl}
                     funFact={intern.funFact}
+                    status={intern.endDate && new Date(intern.endDate) <= new Date() ? 'Completed' : 'Active'}
                   />
                 </div>
               ))}
@@ -165,6 +229,13 @@ const InternDirectory = () => {
         <InternDetail 
           internId={selectedInternId}
           onClose={handleCloseDetail}
+        />
+      )}
+      
+      {selectedProjectId && (
+        <ProjectDetail
+          projectId={selectedProjectId}
+          onClose={handleCloseProjectDetail}
         />
       )}
     </div>

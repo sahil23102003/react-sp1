@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchInternById } from '../services/api';
 import TechStackForm from './TechStackForm';
+import InternEditForm from './InternEditForm';
 import './InternDetail.css';
 
 const InternDetail = ({ internId, onClose }) => {
@@ -8,6 +9,7 @@ const InternDetail = ({ internId, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showTechStackForm, setShowTechStackForm] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     const loadInternDetails = async () => {
@@ -56,7 +58,8 @@ const InternDetail = ({ internId, onClose }) => {
                 }
               ],
             },
-            techStacks: response.data.techStacks || ['JavaScript', 'React', 'Node.js']
+            techStacks: response.data.techStacks || ['JavaScript', 'React', 'Node.js'],
+            assignedProjects: response.data.assignedProjects || []
           };
           
           setIntern(internData);
@@ -77,6 +80,11 @@ const InternDetail = ({ internId, onClose }) => {
   const handleTechStackUpdated = (updatedIntern) => {
     setIntern(updatedIntern);
     setShowTechStackForm(false);
+  };
+
+  const handleInternUpdated = (updatedIntern) => {
+    setIntern(updatedIntern);
+    setIsEditMode(false);
   };
 
   // Handle click outside to close the modal
@@ -134,6 +142,26 @@ const InternDetail = ({ internId, onClose }) => {
     return null;
   }
 
+  if (isEditMode) {
+    return (
+      <div className="detail-overlay" onClick={handleOverlayClick}>
+        <div className="detail-container">
+          <button className="detail-close" onClick={() => setIsEditMode(false)}>×</button>
+          <InternEditForm 
+            intern={intern} 
+            onSave={handleInternUpdated} 
+            onCancel={() => setIsEditMode(false)} 
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Check if intern is active
+  const now = new Date();
+  const isActive = !intern.endDate || new Date(intern.endDate) > now;
+  const status = isActive ? 'Active' : 'Completed';
+
   return (
     <div className="detail-overlay" onClick={handleOverlayClick}>
       <div className="detail-container">
@@ -150,9 +178,22 @@ const InternDetail = ({ internId, onClose }) => {
           <div className="detail-name-section">
             <h2 className="detail-name">{intern.name}</h2>
             <p className="detail-role">{intern.role}</p>
-            <span className="detail-department">{intern.department}</span>
+            <div className="detail-status-badges">
+              <span className="detail-department">{intern.department}</span>
+              <span className={`detail-status ${isActive ? 'status-active' : 'status-completed'}`}>
+                {status}
+              </span>
+            </div>
           </div>
-          <button className="detail-close" onClick={onClose}>×</button>
+          <div className="detail-action-buttons">
+            <button 
+              className="detail-edit-button"
+              onClick={() => setIsEditMode(true)}
+            >
+              Edit Details
+            </button>
+            <button className="detail-close" onClick={onClose}>×</button>
+          </div>
         </div>
 
         <div className="detail-content">
@@ -168,6 +209,21 @@ const InternDetail = ({ internId, onClose }) => {
             <div className="detail-metric-card">
               <p className="detail-metric-value">{intern.performance.projects.length}</p>
               <p className="detail-metric-label">Projects</p>
+            </div>
+          </div>
+
+          <div className="detail-section detail-dates-section">
+            <div className="detail-dates">
+              <div className="detail-date-item">
+                <span className="detail-date-label">Join Date:</span>
+                <span className="detail-date-value">{new Date(intern.joinDate).toLocaleDateString()}</span>
+              </div>
+              <div className="detail-date-item">
+                <span className="detail-date-label">End Date:</span>
+                <span className="detail-date-value">
+                  {intern.endDate ? new Date(intern.endDate).toLocaleDateString() : 'Not set'}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -269,6 +325,24 @@ const InternDetail = ({ internId, onClose }) => {
               </div>
             </div>
           </div>
+          
+          {intern.assignedProjects && intern.assignedProjects.length > 0 && (
+            <div className="detail-section">
+              <h3 className="detail-section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Assigned Projects
+              </h3>
+              <div className="assigned-projects-list">
+                {intern.assignedProjects.map(projectId => (
+                  <div key={projectId} className="assigned-project-item">
+                    Project #{projectId}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

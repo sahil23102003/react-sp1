@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { addIntern } from '../services/api';
+import { useState, useEffect } from 'react';
+import { updateIntern } from '../services/api';
 import './InternForm.css';
 
 const AVAILABLE_TECH_STACKS = [
@@ -12,32 +12,46 @@ const AVAILABLE_TECH_STACKS = [
   'Python', 'Java', 'C#', '.NET', 'PHP'
 ];
 
-const initialFormState = {
-  name: '',
-  role: '',
-  department: '',
-  email: '',
-  phone: '',
-  imageUrl: '',
-  funFact: '',
-  joinDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
-  endDate: '', // New field for end date
-  techStacks: [],
-  performance: {
-    rating: '4.0',
-    sprints: 1,
-    projects: [],
-    courses: []
-  },
-  assignedProjects: [] // New field for project assignments
-};
-
-const InternForm = ({ onInternAdded }) => {
-  const [formData, setFormData] = useState(initialFormState);
+const InternEditForm = ({ intern, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    role: '',
+    department: '',
+    email: '',
+    phone: '',
+    imageUrl: '',
+    funFact: '',
+    joinDate: '',
+    endDate: '',
+    techStacks: [],
+    performance: {
+      rating: '4.0',
+      sprints: 1,
+      projects: [],
+      courses: []
+    }
+  });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Initialize form with intern data
+  useEffect(() => {
+    if (intern) {
+      setFormData({
+        ...intern,
+        // Ensure performance object exists
+        performance: intern.performance || {
+          rating: '4.0',
+          sprints: 1,
+          projects: [],
+          courses: []
+        },
+        // Ensure techStacks array exists
+        techStacks: intern.techStacks || []
+      });
+    }
+  }, [intern]);
 
   // Validate the form data
   const validateForm = () => {
@@ -157,29 +171,21 @@ const InternForm = ({ onInternAdded }) => {
     setIsSubmitting(true);
     
     try {
-      // Generate a random placeholder image if none provided
-      const submissionData = {
-        ...formData,
-        imageUrl: formData.imageUrl || `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 100)}.jpg`
-      };
+      const response = await updateIntern(intern.id, formData);
       
-      const response = await addIntern(submissionData);
-      
-      if (response.status === 201) {
+      if (response.status === 200) {
         // Success!
         setSubmitSuccess(true);
-        setFormData(initialFormState);
-        setShowAdvanced(false);
         
         // Notify parent component
-        if (onInternAdded) {
-          onInternAdded(response.data);
+        if (onSave) {
+          onSave(response.data);
         }
       } else {
         // Handle API error
         setErrors({
           ...errors,
-          form: response.message || 'Failed to add intern. Please try again.'
+          form: response.message || 'Failed to update intern. Please try again.'
         });
       }
     } catch (error) {
@@ -195,12 +201,12 @@ const InternForm = ({ onInternAdded }) => {
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Add New Intern</h2>
+      <h2 className="form-title">Edit Intern</h2>
       
       {/* Success message */}
       {submitSuccess && (
         <div className="form-success">
-          Intern added successfully!
+          Intern updated successfully!
         </div>
       )}
       
@@ -296,7 +302,7 @@ const InternForm = ({ onInternAdded }) => {
                 type="date"
                 id="endDate"
                 name="endDate"
-                value={formData.endDate}
+                value={formData.endDate || ''}
                 onChange={handleChange}
                 className={`form-input ${errors.endDate ? 'invalid' : ''}`}
               />
@@ -366,78 +372,64 @@ const InternForm = ({ onInternAdded }) => {
             rows="3"
           />
         </div>
-
-        <div className="advanced-toggle">
-          <button 
-            type="button" 
-            className="toggle-button"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-          >
-            {showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options'}
-          </button>
-        </div>
-        
-        {showAdvanced && (
-          <>
-            <h3 className="form-section-title">Tech Stacks</h3>
-            <div className="tech-stacks-grid">
-              {AVAILABLE_TECH_STACKS.map((tech) => (
-                <div 
-                  key={tech}
-                  className={`tech-stack-item ${formData.techStacks.includes(tech) ? 'selected' : ''}`}
-                  onClick={() => handleTechStackToggle(tech)}
-                >
-                  <input
-                    type="checkbox"
-                    id={`tech-${tech}`}
-                    checked={formData.techStacks.includes(tech)}
-                    onChange={() => {}} // Handled by onClick on parent div
-                    readOnly
-                  />
-                  <label htmlFor={`tech-${tech}`}>{tech}</label>
-                </div>
-              ))}
-            </div>
             
-            <h3 className="form-section-title">Performance Metrics</h3>
-            <div className="form-row">
-              <div className="form-col">
-                <div className="form-group">
-                  <label htmlFor="rating" className="form-label">Initial Rating</label>
-                  <select
-                    id="rating"
-                    name="performance.rating"
-                    value={formData.performance.rating}
-                    onChange={handleChange}
-                    className="form-select"
-                  >
-                    <option value="3.0">3.0</option>
-                    <option value="3.5">3.5</option>
-                    <option value="4.0">4.0</option>
-                    <option value="4.5">4.5</option>
-                    <option value="5.0">5.0</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="form-col">
-                <div className="form-group">
-                  <label htmlFor="sprints" className="form-label">Initial Sprints</label>
-                  <input
-                    type="number"
-                    id="sprints"
-                    name="performance.sprints"
-                    value={formData.performance.sprints}
-                    onChange={handleChange}
-                    min="0"
-                    max="20"
-                    className="form-input"
-                  />
-                </div>
-              </div>
+        <h3 className="form-section-title">Performance Metrics</h3>
+        <div className="form-row">
+          <div className="form-col">
+            <div className="form-group">
+              <label htmlFor="rating" className="form-label">Rating</label>
+              <select
+                id="rating"
+                name="performance.rating"
+                value={formData.performance.rating}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="3.0">3.0</option>
+                <option value="3.5">3.5</option>
+                <option value="4.0">4.0</option>
+                <option value="4.5">4.5</option>
+                <option value="5.0">5.0</option>
+              </select>
             </div>
-          </>
-        )}
+          </div>
+          
+          <div className="form-col">
+            <div className="form-group">
+              <label htmlFor="sprints" className="form-label">Sprints</label>
+              <input
+                type="number"
+                id="sprints"
+                name="performance.sprints"
+                value={formData.performance.sprints}
+                onChange={handleChange}
+                min="0"
+                max="20"
+                className="form-input"
+              />
+            </div>
+          </div>
+        </div>
+
+        <h3 className="form-section-title">Tech Stacks</h3>
+        <div className="tech-stacks-grid">
+          {AVAILABLE_TECH_STACKS.map((tech) => (
+            <div 
+              key={tech}
+              className={`tech-stack-item ${formData.techStacks.includes(tech) ? 'selected' : ''}`}
+              onClick={() => handleTechStackToggle(tech)}
+            >
+              <input
+                type="checkbox"
+                id={`tech-${tech}`}
+                checked={formData.techStacks.includes(tech)}
+                onChange={() => {}} // Handled by onClick on parent div
+                readOnly
+              />
+              <label htmlFor={`tech-${tech}`}>{tech}</label>
+            </div>
+          ))}
+        </div>
         
         <div className="form-actions">
           <button 
@@ -445,7 +437,23 @@ const InternForm = ({ onInternAdded }) => {
             className="submit-button"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Adding...' : 'Add Intern'}
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </button>
+          <button 
+            type="button" 
+            className="cancel-button"
+            onClick={onCancel}
+            style={{
+              marginLeft: '10px',
+              background: 'transparent',
+              border: '1px solid #d1d5db',
+              color: '#4b5563',
+              padding: '10px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
           </button>
         </div>
       </form>
@@ -453,4 +461,4 @@ const InternForm = ({ onInternAdded }) => {
   );
 };
 
-export default InternForm;
+export default InternEditForm;
