@@ -1,56 +1,81 @@
 // API service with JSON Server
 const API_URL = 'http://localhost:3001';
 
-// GET - Fetch all interns
-export const fetchInterns = async () => {
-  try {
-    const response = await fetch(`${API_URL}/interns`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
+// Helper function to handle fetch responses
+const handleResponse = async (response, successMessage) => {
+  if (response.status === 404) {
     return {
-      status: 200,
+      status: 404,
+      data: null,
+      message: 'Resource not found'
+    };
+  }
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  
+  try {
+    const data = await response.json();
+    return {
+      status: response.status,
       data: data,
-      message: 'Interns fetched successfully'
+      message: successMessage
     };
   } catch (error) {
+    // If the response is empty or not valid JSON
+    return {
+      status: response.status,
+      data: null,
+      message: successMessage
+    };
+  }
+};
+
+// GET - Fetch all interns with better error handling
+export const fetchInterns = async () => {
+  try {
+    // First check if we can connect to the server at all
+    const response = await fetch(`${API_URL}/interns`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    return await handleResponse(response, 'Interns fetched successfully');
+  } catch (error) {
     console.error('Error fetching interns:', error);
+    // Check if it's a connection error
+    if (error.message.includes('Failed to fetch') || error.message.includes('Network Error')) {
+      return {
+        status: 503,
+        data: [],
+        message: 'Cannot connect to the server. Make sure JSON Server is running at ' + API_URL
+      };
+    }
+    
     return {
       status: 500,
-      data: null,
-      message: 'Failed to fetch interns'
+      data: [],
+      message: 'Failed to fetch interns: ' + error.message
     };
   }
 };
 
 // GET - Fetch single intern by ID
 export const fetchInternById = async (id) => {
+  if (!id) {
+    return {
+      status: 400,
+      data: null,
+      message: 'Invalid intern ID'
+    };
+  }
+  
   try {
     const response = await fetch(`${API_URL}/interns/${id}`);
-    
-    if (response.status === 404) {
-      return {
-        status: 404,
-        data: null,
-        message: 'Intern not found'
-      };
-    }
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    return {
-      status: 200,
-      data: data,
-      message: 'Intern fetched successfully'
-    };
+    return await handleResponse(response, 'Intern fetched successfully');
   } catch (error) {
     console.error('Error fetching intern:', error);
     return {
@@ -95,6 +120,14 @@ export const addIntern = async (internData) => {
 
 // PUT - Update an intern
 export const updateIntern = async (id, internData) => {
+  if (!id) {
+    return {
+      status: 400,
+      data: null,
+      message: 'Invalid intern ID'
+    };
+  }
+  
   try {
     const response = await fetch(`${API_URL}/interns/${id}`, {
       method: 'PUT',
@@ -135,6 +168,14 @@ export const updateIntern = async (id, internData) => {
 
 // DELETE - Delete an intern
 export const deleteIntern = async (id) => {
+  if (!id) {
+    return {
+      status: 400,
+      data: null,
+      message: 'Invalid intern ID'
+    };
+  }
+  
   try {
     const response = await fetch(`${API_URL}/interns/${id}`, {
       method: 'DELETE',
@@ -172,53 +213,49 @@ export const deleteIntern = async (id) => {
 // GET - Fetch all projects
 export const fetchProjects = async () => {
   try {
-    const response = await fetch(`${API_URL}/projects`);
+    // Check if the endpoint exists by fetching with HEAD first
+    const checkResponse = await fetch(`${API_URL}/projects`, { 
+      method: 'HEAD',
+      headers: {
+        'Accept': 'application/json'
+      }
+    }).catch(() => ({ ok: false }));
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!checkResponse.ok) {
+      console.warn('Projects endpoint may not exist. Creating a placeholder response.');
+      // Return an empty array if the endpoint doesn't exist
+      return {
+        status: 200,
+        data: [],
+        message: 'No projects found. The projects endpoint may not exist in your JSON server.'
+      };
     }
     
-    const data = await response.json();
-    
-    return {
-      status: 200,
-      data: data,
-      message: 'Projects fetched successfully'
-    };
+    const response = await fetch(`${API_URL}/projects`);
+    return await handleResponse(response, 'Projects fetched successfully');
   } catch (error) {
     console.error('Error fetching projects:', error);
     return {
       status: 500,
-      data: null,
-      message: 'Failed to fetch projects'
+      data: [],
+      message: 'Failed to fetch projects. Make sure your JSON server is configured to handle projects.'
     };
   }
 };
 
 // GET - Fetch single project by ID
 export const fetchProjectById = async (id) => {
+  if (!id) {
+    return {
+      status: 400,
+      data: null,
+      message: 'Invalid project ID'
+    };
+  }
+  
   try {
     const response = await fetch(`${API_URL}/projects/${id}`);
-    
-    if (response.status === 404) {
-      return {
-        status: 404,
-        data: null,
-        message: 'Project not found'
-      };
-    }
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    return {
-      status: 200,
-      data: data,
-      message: 'Project fetched successfully'
-    };
+    return await handleResponse(response, 'Project fetched successfully');
   } catch (error) {
     console.error('Error fetching project:', error);
     return {
@@ -232,6 +269,20 @@ export const fetchProjectById = async (id) => {
 // POST - Add a new project
 export const addProject = async (projectData) => {
   try {
+    // First check if the endpoint exists
+    const checkResponse = await fetch(`${API_URL}/projects`, { 
+      method: 'HEAD' 
+    }).catch(() => ({ ok: false }));
+    
+    if (!checkResponse.ok) {
+      console.error('Projects endpoint does not exist');
+      return {
+        status: 404,
+        data: null,
+        message: 'Projects endpoint not found. Make sure your JSON server is configured with a "projects" route.'
+      };
+    }
+    
     const response = await fetch(`${API_URL}/projects`, {
       method: 'POST',
       headers: {
@@ -240,29 +291,27 @@ export const addProject = async (projectData) => {
       body: JSON.stringify(projectData),
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    return {
-      status: 201,
-      data: data,
-      message: 'Project added successfully'
-    };
+    return await handleResponse(response, 'Project added successfully');
   } catch (error) {
     console.error('Error adding project:', error);
     return {
       status: 500,
       data: null,
-      message: 'Failed to add project'
+      message: 'Failed to add project: ' + error.message
     };
   }
 };
 
 // PUT - Update a project
 export const updateProject = async (id, projectData) => {
+  if (!id) {
+    return {
+      status: 400,
+      data: null,
+      message: 'Invalid project ID'
+    };
+  }
+  
   try {
     const response = await fetch(`${API_URL}/projects/${id}`, {
       method: 'PUT',
@@ -303,6 +352,14 @@ export const updateProject = async (id, projectData) => {
 
 // DELETE - Delete a project
 export const deleteProject = async (id) => {
+  if (!id) {
+    return {
+      status: 400,
+      data: null,
+      message: 'Invalid project ID'
+    };
+  }
+  
   try {
     const response = await fetch(`${API_URL}/projects/${id}`, {
       method: 'DELETE',
@@ -337,17 +394,30 @@ export const deleteProject = async (id) => {
 
 // Assign an intern to a project
 export const assignInternToProject = async (internId, projectId) => {
+  if (!internId || !projectId) {
+    return {
+      status: 400,
+      message: 'Invalid intern or project ID'
+    };
+  }
+  
   try {
     // First get the intern data
     const internResponse = await fetchInternById(internId);
-    if (internResponse.status !== 200) {
-      throw new Error('Failed to fetch intern');
+    if (internResponse.status !== 200 || !internResponse.data) {
+      return {
+        status: 404,
+        message: 'Intern not found'
+      };
     }
     
     // Then get the project data
     const projectResponse = await fetchProjectById(projectId);
-    if (projectResponse.status !== 200) {
-      throw new Error('Failed to fetch project');
+    if (projectResponse.status !== 200 || !projectResponse.data) {
+      return {
+        status: 404,
+        message: 'Project not found'
+      };
     }
     
     const intern = internResponse.data;
@@ -377,7 +447,10 @@ export const assignInternToProject = async (internId, projectId) => {
     const updateProjectResponse = await updateProject(projectId, project);
     
     if (updateInternResponse.status !== 200 || updateProjectResponse.status !== 200) {
-      throw new Error('Failed to update assignment');
+      return {
+        status: 500,
+        message: 'Failed to update assignment'
+      };
     }
     
     return {
@@ -388,24 +461,37 @@ export const assignInternToProject = async (internId, projectId) => {
     console.error('Error assigning intern to project:', error);
     return {
       status: 500,
-      message: 'Failed to assign intern to project'
+      message: 'Failed to assign intern to project: ' + error.message
     };
   }
 };
 
 // Remove an intern from a project
 export const removeInternFromProject = async (internId, projectId) => {
+  if (!internId || !projectId) {
+    return {
+      status: 400,
+      message: 'Invalid intern or project ID'
+    };
+  }
+  
   try {
     // First get the intern data
     const internResponse = await fetchInternById(internId);
-    if (internResponse.status !== 200) {
-      throw new Error('Failed to fetch intern');
+    if (internResponse.status !== 200 || !internResponse.data) {
+      return {
+        status: 404,
+        message: 'Intern not found'
+      };
     }
     
     // Then get the project data
     const projectResponse = await fetchProjectById(projectId);
-    if (projectResponse.status !== 200) {
-      throw new Error('Failed to fetch project');
+    if (projectResponse.status !== 200 || !projectResponse.data) {
+      return {
+        status: 404,
+        message: 'Project not found'
+      };
     }
     
     const intern = internResponse.data;
@@ -427,7 +513,10 @@ export const removeInternFromProject = async (internId, projectId) => {
     const updateProjectResponse = await updateProject(projectId, project);
     
     if (updateInternResponse.status !== 200 || updateProjectResponse.status !== 200) {
-      throw new Error('Failed to update assignment');
+      return {
+        status: 500,
+        message: 'Failed to update assignment'
+      };
     }
     
     return {
@@ -438,7 +527,7 @@ export const removeInternFromProject = async (internId, projectId) => {
     console.error('Error removing intern from project:', error);
     return {
       status: 500,
-      message: 'Failed to remove intern from project'
+      message: 'Failed to remove intern from project: ' + error.message
     };
   }
 };

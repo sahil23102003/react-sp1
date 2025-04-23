@@ -8,6 +8,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .profile-card:hover {
@@ -46,6 +47,7 @@
   position: absolute;
   top: 70px;
   right: 16px;
+  z-index: 2;
 }
 
 .profile-status-badge {
@@ -53,6 +55,7 @@
   padding: 2px 8px;
   border-radius: 12px;
   font-weight: 500;
+  display: inline-block;
 }
 
 .status-active {

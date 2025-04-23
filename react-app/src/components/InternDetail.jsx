@@ -17,11 +17,16 @@ const InternDetail = ({ internId, onClose }) => {
         setLoading(true);
         setError(null);
         
-        if (!internId) return;
+        if (!internId) {
+          setError("No intern ID provided");
+          setLoading(false);
+          return;
+        }
         
+        console.log(`Loading intern details for ID: ${internId}`);
         const response = await fetchInternById(internId);
         
-        if (response.status === 200) {
+        if (response.status === 200 && response.data) {
           // Add mock data for demo purposes if not already present
           const internData = {
             ...response.data,
@@ -139,7 +144,16 @@ const InternDetail = ({ internId, onClose }) => {
   }
 
   if (!intern) {
-    return null;
+    return (
+      <div className="detail-overlay" onClick={handleOverlayClick}>
+        <div className="detail-container">
+          <div className="detail-content" style={{ textAlign: 'center', padding: '40px' }}>
+            No intern data found. Please try again.
+          </div>
+          <button className="detail-close" onClick={onClose}>×</button>
+        </div>
+      </div>
+    );
   }
 
   if (isEditMode) {
@@ -243,9 +257,13 @@ const InternDetail = ({ internId, onClose }) => {
             ) : (
               <>
                 <div className="tech-stack-list">
-                  {intern.techStacks && intern.techStacks.map(tech => (
-                    <span key={tech} className="tech-stack-tag">{tech}</span>
-                  ))}
+                  {intern.techStacks && intern.techStacks.length > 0 ? (
+                    intern.techStacks.map(tech => (
+                      <span key={tech} className="tech-stack-tag">{tech}</span>
+                    ))
+                  ) : (
+                    <span>No tech stacks added yet</span>
+                  )}
                 </div>
                 <button 
                   className="tech-form-submit" 
@@ -266,12 +284,18 @@ const InternDetail = ({ internId, onClose }) => {
               Projects
             </h3>
             <div className="project-list">
-              {intern.performance.projects.map(project => (
-                <div key={project.id} className="project-item">
-                  <h4 className="project-name">{project.name}</h4>
-                  <p className="project-description">{project.description}</p>
+              {intern.performance.projects && intern.performance.projects.length > 0 ? (
+                intern.performance.projects.map(project => (
+                  <div key={project.id} className="project-item">
+                    <h4 className="project-name">{project.name}</h4>
+                    <p className="project-description">{project.description}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="project-item">
+                  <p className="project-description">No projects assigned yet</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -283,19 +307,27 @@ const InternDetail = ({ internId, onClose }) => {
               Courses
             </h3>
             <div className="course-list">
-              {intern.performance.courses.map(course => (
-                <div key={course.id} className="course-item">
-                  <div className="course-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
+              {intern.performance.courses && intern.performance.courses.length > 0 ? (
+                intern.performance.courses.map(course => (
+                  <div key={course.id} className="course-item">
+                    <div className="course-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <div className="course-info">
+                      <h4 className="course-name">{course.name}</h4>
+                      <p className="course-status">{course.status}</p>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="course-item">
                   <div className="course-info">
-                    <h4 className="course-name">{course.name}</h4>
-                    <p className="course-status">{course.status}</p>
+                    <p>No courses completed yet</p>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 

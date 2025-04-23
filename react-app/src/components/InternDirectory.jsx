@@ -29,7 +29,7 @@ const InternDirectory = () => {
       const response = await fetchInterns();
       
       if (response.status === 200) {
-        setInterns(response.data);
+        setInterns(response.data || []); // Ensure we always have an array
       } else {
         setError(response.message || 'Failed to load interns');
       }
@@ -70,7 +70,11 @@ const InternDirectory = () => {
   };
 
   const handleInternSelected = (internId) => {
-    setSelectedInternId(internId);
+    if (internId && typeof internId === 'number') {
+      setSelectedInternId(internId);
+    } else {
+      console.error('Invalid intern ID:', internId);
+    }
   };
 
   const handleProjectSelected = (projectId) => {
@@ -202,20 +206,24 @@ const InternDirectory = () => {
             />
           ) : (
             <div className="interns-grid">
-              {interns.map((intern) => (
-                <div key={intern.id} onClick={() => handleInternSelected(intern.id)}>
-                  <ProfileCard
-                    name={intern.name}
-                    role={intern.role}
-                    department={intern.department}
-                    email={intern.email}
-                    phone={intern.phone}
-                    imageUrl={intern.imageUrl}
-                    funFact={intern.funFact}
-                    status={intern.endDate && new Date(intern.endDate) <= new Date() ? 'Completed' : 'Active'}
-                  />
-                </div>
-              ))}
+              {interns && interns.length > 0 ? (
+                interns.map((intern) => (
+                  <div key={intern.id} onClick={() => handleInternSelected(intern.id)}>
+                    <ProfileCard
+                      name={intern.name}
+                      role={intern.role}
+                      department={intern.department}
+                      email={intern.email}
+                      phone={intern.phone}
+                      imageUrl={intern.imageUrl}
+                      funFact={intern.funFact}
+                      status={intern.endDate && new Date(intern.endDate) <= new Date() ? 'Completed' : 'Active'}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="no-interns">No interns found. Add some interns to get started!</div>
+              )}
             </div>
           )}
         </>
