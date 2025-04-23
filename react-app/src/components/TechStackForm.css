@@ -1,0 +1,97 @@
+.tech-form-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .tech-form-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  .tech-stacks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  @media (min-width: 768px) {
+    .tech-stacks-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .tech-stacks-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  .tech-stack-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .tech-stack-item:hover {
+    background-color: #f9fafb;
+  }
+  
+  .tech-stack-item.selected {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+  }
+  
+  .tech-stack-item input {
+    margin: 0;
+  }
+  
+  .tech-form-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .tech-form-submit {
+    background-color: #3b82f6;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  
+  .tech-form-submit:hover {
+    background-color: #2563eb;
+  }
+  
+  .tech-form-submit:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+  
+  .tech-form-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+  
+  .tech-form-error {
+    background-color: #fee2e2;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }

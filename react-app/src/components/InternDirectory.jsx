@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import ProfileCard from './ProfileCard';
 import InternForm from './InternForm';
 import InternTable from './InternTable';
+import InternDetail from './InternDetail';
+import InternReports from './InternReports';
 import { fetchInterns } from '../services/api';
 import './InternDirectory.css';
 
@@ -9,8 +11,9 @@ const InternDirectory = () => {
   const [interns, setInterns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'table'
+  const [viewMode, setViewMode] = useState('cards'); // 'cards', 'table', or 'reports'
   const [showForm, setShowForm] = useState(false);
+  const [selectedInternId, setSelectedInternId] = useState(null);
 
   const loadInterns = async () => {
     try {
@@ -45,6 +48,8 @@ const InternDirectory = () => {
   const handleInternAdded = (newIntern) => {
     // Refresh the intern list
     loadInterns();
+    // Hide the form after successful addition
+    setShowForm(false);
   };
 
   const handleInternDeleted = (deletedId) => {
@@ -52,26 +57,63 @@ const InternDirectory = () => {
     loadInterns();
   };
 
+  const handleInternSelected = (internId) => {
+    setSelectedInternId(internId);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedInternId(null);
+    // Refresh data when detail view is closed (in case updates were made)
+    loadInterns();
+  };
+
   const toggleViewMode = (mode) => {
+    // When changing view mode, hide the form
+    setShowForm(false);
     setViewMode(mode);
   };
 
   const toggleForm = () => {
     setShowForm(!showForm);
+    // If showing form, ensure we're in cards/table view, not reports
+    if (!showForm && viewMode === 'reports') {
+      setViewMode('cards');
+    }
   };
 
   return (
     <div className="directory-container">
-      <h2 className="directory-title">Intern Directory</h2>
-      
-      <div className="directory-controls">
-        <button className="refresh-button" onClick={handleRefresh}>
-          Refresh Data
-        </button>
-        
-        <button className="toggle-form-button" onClick={toggleForm}>
-          {showForm ? 'Hide Form' : 'Add New Intern'}
-        </button>
+      <div className="directory-controls-wrapper">
+        <div className="directory-actions">
+          <button className="refresh-button" onClick={handleRefresh}>
+            Refresh Data
+          </button>
+          
+          <button className="toggle-form-button" onClick={toggleForm}>
+            {showForm ? 'Hide Form' : 'Add New Intern'}
+          </button>
+        </div>
+
+        <div className="view-toggle">
+          <button 
+            className={`view-toggle-btn ${viewMode === 'cards' ? 'active' : ''}`}
+            onClick={() => toggleViewMode('cards')}
+          >
+            Card View
+          </button>
+          <button 
+            className={`view-toggle-btn ${viewMode === 'table' ? 'active' : ''}`}
+            onClick={() => toggleViewMode('table')}
+          >
+            Table View
+          </button>
+          <button 
+            className={`view-toggle-btn ${viewMode === 'reports' ? 'active' : ''}`}
+            onClick={() => toggleViewMode('reports')}
+          >
+            Reports
+          </button>
+        </div>
       </div>
       
       {showForm && (
@@ -84,48 +126,46 @@ const InternDirectory = () => {
         </div>
       )}
       
-      <div className="view-toggle">
-        <button 
-          className={`view-toggle-btn ${viewMode === 'cards' ? 'active' : ''}`}
-          onClick={() => toggleViewMode('cards')}
-        >
-          Card View
-        </button>
-        <button 
-          className={`view-toggle-btn ${viewMode === 'table' ? 'active' : ''}`}
-          onClick={() => toggleViewMode('table')}
-        >
-          Table View
-        </button>
-      </div>
-      
-      {loading ? (
-        <div className="loading">Loading interns...</div>
-      ) : (
+      {!showForm && !loading && (
         <>
-          {viewMode === 'table' ? (
+          {viewMode === 'reports' ? (
+            <InternReports />
+          ) : viewMode === 'table' ? (
             <InternTable 
               interns={interns} 
               onInternDeleted={handleInternDeleted}
+              onInternSelected={handleInternSelected}
               loading={loading}
             />
           ) : (
             <div className="interns-grid">
               {interns.map((intern) => (
-                <ProfileCard
-                  key={intern.id}
-                  name={intern.name}
-                  role={intern.role}
-                  department={intern.department}
-                  email={intern.email}
-                  phone={intern.phone}
-                  imageUrl={intern.imageUrl}
-                  funFact={intern.funFact}
-                />
+                <div key={intern.id} onClick={() => handleInternSelected(intern.id)}>
+                  <ProfileCard
+                    name={intern.name}
+                    role={intern.role}
+                    department={intern.department}
+                    email={intern.email}
+                    phone={intern.phone}
+                    imageUrl={intern.imageUrl}
+                    funFact={intern.funFact}
+                  />
+                </div>
               ))}
             </div>
           )}
         </>
+      )}
+      
+      {loading && (
+        <div className="loading">Loading interns...</div>
+      )}
+      
+      {selectedInternId && (
+        <InternDetail 
+          internId={selectedInternId}
+          onClose={handleCloseDetail}
+        />
       )}
     </div>
   );

@@ -2,6 +2,21 @@
   margin: 20px 0;
 }
 
+.directory-controls-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.directory-actions {
+  display: flex;
+  gap: 10px;
+}
+
 .directory-title {
   font-size: 1.5rem;
   font-weight: 600;
@@ -31,7 +46,7 @@
 }
 
 /* Responsive grid */
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .interns-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -51,19 +66,11 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  transition: background-color 0.2s;
 }
 
 .refresh-button:hover {
   background-color: #374151;
-}
-
-.directory-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
 }
 
 .toggle-form-button {
@@ -74,9 +81,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  transition: background-color 0.2s;
 }
 
 .toggle-form-button:hover {
@@ -85,7 +90,6 @@
 
 .view-toggle {
   display: flex;
-  margin-bottom: 20px;
 }
 
 .view-toggle-btn {
@@ -94,6 +98,7 @@
   border: 1px solid #d1d5db;
   cursor: pointer;
   font-size: 0.9rem;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .view-toggle-btn:first-child {
@@ -118,4 +123,21 @@
   background-color: #f9fafb;
   border-radius: 8px;
   color: #6b7280;
+}
+
+/* Make sure controls don't break on small screens */
+@media (max-width: 640px) {
+  .directory-controls-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .view-toggle {
+    width: 100%;
+  }
+  
+  .view-toggle-btn {
+    flex: 1;
+    text-align: center;
+  }
 }

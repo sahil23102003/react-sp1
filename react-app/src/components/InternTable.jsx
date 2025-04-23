@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { deleteIntern } from '../services/api';
 import './InternTable.css';
 
-const InternTable = ({ interns, onInternDeleted, loading }) => {
+const InternTable = ({ interns, onInternDeleted, onInternSelected, loading }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [sortField, setSortField] = useState('name');
@@ -92,6 +92,13 @@ const InternTable = ({ interns, onInternDeleted, loading }) => {
         console.error('Error deleting intern:', error);
         alert('An unexpected error occurred');
       }
+    }
+  };
+
+  // Handle row click to view details
+  const handleRowClick = (intern) => {
+    if (onInternSelected) {
+      onInternSelected(intern.id);
     }
   };
 
@@ -226,7 +233,11 @@ const InternTable = ({ interns, onInternDeleted, loading }) => {
             <tbody>
               {paginatedInterns.length > 0 ? (
                 paginatedInterns.map((intern) => (
-                  <tr key={intern.id}>
+                  <tr 
+                    key={intern.id} 
+                    className="clickable-row"
+                    onClick={() => handleRowClick(intern)}
+                  >
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <img 
@@ -245,10 +256,19 @@ const InternTable = ({ interns, onInternDeleted, loading }) => {
                     <td>{intern.department}</td>
                     <td>{new Date(intern.joinDate).toLocaleDateString()}</td>
                     <td>{intern.email}</td>
-                    <td>
+                    <td onClick={(e) => e.stopPropagation()}>
+                      <button
+                        className="table-action-btn"
+                        onClick={() => handleRowClick(intern)}
+                      >
+                        View
+                      </button>
                       <button
                         className="table-action-btn delete"
-                        onClick={() => handleDelete(intern.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(intern.id);
+                        }}
                       >
                         Delete
                       </button>

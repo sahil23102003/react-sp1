@@ -2,6 +2,16 @@ import { useState } from 'react';
 import { addIntern } from '../services/api';
 import './InternForm.css';
 
+const AVAILABLE_TECH_STACKS = [
+  'JavaScript', 'TypeScript', 'React', 'Angular', 'Vue',
+  'Node.js', 'Express', 'Django', 'Flask', 'Spring Boot',
+  'MongoDB', 'PostgreSQL', 'MySQL', 'Redis', 'Firebase',
+  'Docker', 'Kubernetes', 'AWS', 'Azure', 'Google Cloud',
+  'GraphQL', 'REST API', 'Redux', 'Git', 'GitHub',
+  'SASS/SCSS', 'Tailwind CSS', 'Bootstrap', 'Material UI', 'Webpack',
+  'Python', 'Java', 'C#', '.NET', 'PHP'
+];
+
 const initialFormState = {
   name: '',
   role: '',
@@ -10,7 +20,14 @@ const initialFormState = {
   phone: '',
   imageUrl: '',
   funFact: '',
-  joinDate: new Date().toISOString().split('T')[0] // Today's date in YYYY-MM-DD format
+  joinDate: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+  techStacks: [],
+  performance: {
+    rating: '4.0',
+    sprints: 1,
+    projects: [],
+    courses: []
+  }
 };
 
 const InternForm = ({ onInternAdded }) => {
@@ -18,6 +35,7 @@ const InternForm = ({ onInternAdded }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Validate the form data
   const validateForm = () => {
@@ -66,10 +84,23 @@ const InternForm = ({ onInternAdded }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    
+    // Handle nested performance object
+    if (name.startsWith('performance.')) {
+      const performanceField = name.split('.')[1];
+      setFormData({
+        ...formData,
+        performance: {
+          ...formData.performance,
+          [performanceField]: value
+        }
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
     
     // Clear the error for this field
     if (errors[name]) {
@@ -78,6 +109,29 @@ const InternForm = ({ onInternAdded }) => {
         [name]: undefined
       });
     }
+    
+    // Clear success message when form is modified
+    if (submitSuccess) {
+      setSubmitSuccess(false);
+    }
+  };
+  
+  const handleTechStackToggle = (techStack) => {
+    setFormData(prevData => {
+      const techStacks = [...prevData.techStacks];
+      
+      if (techStacks.includes(techStack)) {
+        return {
+          ...prevData,
+          techStacks: techStacks.filter(item => item !== techStack)
+        };
+      } else {
+        return {
+          ...prevData,
+          techStacks: [...techStacks, techStack]
+        };
+      }
+    });
     
     // Clear success message when form is modified
     if (submitSuccess) {
@@ -108,6 +162,7 @@ const InternForm = ({ onInternAdded }) => {
         // Success!
         setSubmitSuccess(true);
         setFormData(initialFormState);
+        setShowAdvanced(false);
         
         // Notify parent component
         if (onInternAdded) {
@@ -287,14 +342,88 @@ const InternForm = ({ onInternAdded }) => {
             rows="3"
           />
         </div>
+
+        <div className="advanced-toggle">
+          <button 
+            type="button" 
+            className="toggle-button"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+          >
+            {showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options'}
+          </button>
+        </div>
         
-        <button 
-          type="submit" 
-          className="submit-button"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Adding...' : 'Add Intern'}
-        </button>
+        {showAdvanced && (
+          <>
+            <h3 className="form-section-title">Tech Stacks</h3>
+            <div className="tech-stacks-grid">
+              {AVAILABLE_TECH_STACKS.map((tech) => (
+                <div 
+                  key={tech}
+                  className={`tech-stack-item ${formData.techStacks.includes(tech) ? 'selected' : ''}`}
+                  onClick={() => handleTechStackToggle(tech)}
+                >
+                  <input
+                    type="checkbox"
+                    id={`tech-${tech}`}
+                    checked={formData.techStacks.includes(tech)}
+                    onChange={() => {}} // Handled by onClick on parent div
+                    readOnly
+                  />
+                  <label htmlFor={`tech-${tech}`}>{tech}</label>
+                </div>
+              ))}
+            </div>
+            
+            <h3 className="form-section-title">Performance Metrics</h3>
+            <div className="form-row">
+              <div className="form-col">
+                <div className="form-group">
+                  <label htmlFor="rating" className="form-label">Initial Rating</label>
+                  <select
+                    id="rating"
+                    name="performance.rating"
+                    value={formData.performance.rating}
+                    onChange={handleChange}
+                    className="form-select"
+                  >
+                    <option value="3.0">3.0</option>
+                    <option value="3.5">3.5</option>
+                    <option value="4.0">4.0</option>
+                    <option value="4.5">4.5</option>
+                    <option value="5.0">5.0</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="form-col">
+                <div className="form-group">
+                  <label htmlFor="sprints" className="form-label">Initial Sprints</label>
+                  <input
+                    type="number"
+                    id="sprints"
+                    name="performance.sprints"
+                    value={formData.performance.sprints}
+                    onChange={handleChange}
+                    min="0"
+                    max="20"
+                    className="form-input"
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+        
+        <div className="form-actions">
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Adding...' : 'Add Intern'}
+          </button>
+        </div>
       </form>
     </div>
   );

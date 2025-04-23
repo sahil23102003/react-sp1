@@ -1,7 +1,79 @@
 {
   "interns": [
     {
-      "id": "2",
+      "id": 1,
+      "name": "Alex Johnson",
+      "role": "Frontend Developer Intern",
+      "department": "Engineering",
+      "email": "alex.johnson@example.com",
+      "phone": "+1 (555) 123-4567",
+      "imageUrl": "https://randomuser.me/api/portraits/men/1.jpg",
+      "funFact": "Can solve a Rubik's cube in under a minute!",
+      "joinDate": "2024-01-15",
+      "endDate": "2024-07-15",
+      "status": "active",
+      "university": "Stanford University",
+      "degree": "Computer Science",
+      "resumeUrl": "files/resumes/alex_johnson_resume.pdf",
+      "documents": [
+        {
+          "id": 1,
+          "type": "ID",
+          "url": "files/documents/alex_johnson_id.pdf"
+        },
+        {
+          "id": 2,
+          "type": "Certificate",
+          "url": "files/documents/alex_johnson_cert.pdf"
+        }
+      ],
+      "mentorId": 1,
+      "techStacks": ["JavaScript", "React", "Node.js", "HTML/CSS"],
+      "assignedProjects": [
+        {
+          "id": 1,
+          "name": "Company Website Redesign",
+          "description": "Helped implement responsive design components for the company website",
+          "status": "in-progress"
+        },
+        {
+          "id": 2,
+          "name": "Internal Dashboard",
+          "description": "Created data visualization components for the internal dashboard",
+          "status": "completed"
+        }
+      ],
+      "performance": {
+        "rating": "4.7",
+        "sprints": 6,
+        "projects": [
+          {
+            "id": 1,
+            "name": "Company Website Redesign",
+            "description": "Helped implement responsive design components for the company website"
+          },
+          {
+            "id": 2,
+            "name": "Internal Dashboard",
+            "description": "Created data visualization components for the internal dashboard"
+          }
+        ],
+        "courses": [
+          {
+            "id": 1,
+            "name": "Advanced React Patterns",
+            "status": "Completed"
+          },
+          {
+            "id": 2,
+            "name": "State Management with Redux",
+            "status": "In Progress"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
       "name": "Samantha Lee",
       "role": "UI/UX Design Intern",
       "department": "Design",
@@ -9,51 +81,129 @@
       "phone": "+1 (555) 987-6543",
       "imageUrl": "https://randomuser.me/api/portraits/women/2.jpg",
       "funFact": "Speaks four languages fluently!",
-      "joinDate": "2024-02-03"
-    },
+      "joinDate": "2024-02-03",
+      "endDate": "2024-08-03",
+      "status": "active",
+      "university": "Rhode Island School of Design",
+      "degree": "Graphic Design",
+      "resumeUrl": "files/resumes/samantha_lee_resume.pdf",
+      "documents": [
+        {
+          "id": 1,
+          "type": "ID",
+          "url": "files/documents/samantha_lee_id.pdf"
+        }
+      ],
+      "mentorId": 2,
+      "techStacks": ["Figma", "Adobe XD", "Sketch", "HTML/CSS"],
+      "assignedProjects": [
+        {
+          "id": 1,
+          "name": "Mobile App UX Improvement",
+          "description": "Redesigning the user flow for the mobile application",
+          "status": "in-progress"
+        }
+      ],
+      "performance": {
+        "rating": "4.9",
+        "sprints": 5,
+        "projects": [
+          {
+            "id": 1,
+            "name": "Mobile App UX Improvement",
+            "description": "Redesigned the user flow for the mobile application"
+          },
+          {
+            "id": 2,
+            "name": "Design System",
+            "description": "Contributed to the company-wide design system"
+          }
+        ],
+        "courses": [
+          {
+            "id": 1,
+            "name": "User Research Methods",
+            "status": "Completed"
+          },
+          {
+            "id": 2,
+            "name": "UI Animation Fundamentals",
+            "status": "Completed"
+          }
+        ]
+      }
+    }
+  ],
+  "mentors": [
     {
-      "id": "3",
-      "name": "Michael Chen",
-      "role": "Backend Developer Intern",
+      "id": 1,
+      "name": "David Wong",
+      "role": "Senior Frontend Developer",
       "department": "Engineering",
-      "email": "michael.chen@example.com",
-      "phone": "+1 (555) 456-7890",
-      "imageUrl": "https://randomuser.me/api/portraits/men/3.jpg",
-      "funFact": "National chess champion in college!",
-      "joinDate": "2024-02-22"
+      "email": "david.wong@example.com",
+      "imageUrl": "https://randomuser.me/api/portraits/men/20.jpg"
     },
     {
-      "id": "4",
-      "name": "Priya Patel",
-      "role": "Data Science Intern",
-      "department": "Analytics",
-      "email": "priya.patel@example.com",
-      "phone": "+1 (555) 789-0123",
-      "imageUrl": "https://randomuser.me/api/portraits/women/4.jpg",
-      "funFact": "Climbed Mount Kilimanjaro last summer!",
-      "joinDate": "2024-03-10"
+      "id": 2,
+      "name": "Sarah Miller",
+      "role": "Design Lead",
+      "department": "Design",
+      "email": "sarah.miller@example.com",
+      "imageUrl": "https://randomuser.me/api/portraits/women/20.jpg"
     },
     {
-      "id": "5",
-      "name": "James Wilson",
-      "role": "DevOps Intern",
-      "department": "Infrastructure",
-      "email": "james.wilson@example.com",
-      "phone": "+1 (555) 234-5678",
-      "imageUrl": "https://randomuser.me/api/portraits/men/5.jpg",
-      "funFact": "Runs a popular tech podcast in spare time!",
-      "joinDate": "2024-03-25"
-    },
-    {
-      "id": "c546",
-      "name": "sahil kumar",
-      "role": "backend devloper",
+      "id": 3,
+      "name": "Mark Taylor",
+      "role": "Backend Team Lead",
       "department": "Engineering",
-      "email": "sahilkumar23102003@gmail.com",
-      "phone": "8459495467",
-      "imageUrl": "https://randomuser.me/api/portraits/men/80.jpg",
-      "funFact": "hii i am sahil",
-      "joinDate": "2025-04-22"
+      "email": "mark.taylor@example.com",
+      "imageUrl": "https://randomuser.me/api/portraits/men/22.jpg"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "name": "Admin User",
+      "role": "admin",
+      "email": "admin@example.com"
+    },
+    {
+      "id": 2,
+      "username": "mentor1",
+      "password": "mentor123",
+      "name": "David Wong",
+      "role": "mentor",
+      "email": "david.wong@example.com",
+      "mentorId": 1
+    },
+    {
+      "id": 3,
+      "username": "mentor2",
+      "password": "mentor123",
+      "name": "Sarah Miller",
+      "role": "mentor",
+      "email": "sarah.miller@example.com",
+      "mentorId": 2
+    },
+    {
+      "id": 4,
+      "username": "alex",
+      "password": "intern123",
+      "name": "Alex Johnson",
+      "role": "intern",
+      "email": "alex.johnson@example.com",
+      "internId": 1
+    },
+    {
+      "id": 5,
+      "username": "samantha",
+      "password": "intern123",
+      "name": "Samantha Lee",
+      "role": "intern",
+      "email": "samantha.lee@example.com",
+      "internId": 2
     }
   ]
 }

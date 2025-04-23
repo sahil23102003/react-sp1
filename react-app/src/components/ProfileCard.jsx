@@ -18,46 +18,40 @@ const ProfileCard = ({
 
   return (
     <div className="profile-card">
-      {/* Header with image */}
       <div className="profile-header">
         <img 
           src={imageUrl} 
           alt={`${name}'s profile`} 
-          className="profile-image"
+          className="profile-avatar"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+            e.target.src = 'https://via.placeholder.com/150?text=No+Image';
           }}
         />
-        <div className="profile-overlay">
-          <h2 className="profile-name">{name}</h2>
-          <p className="profile-role">{role}</p>
-        </div>
       </div>
       
-      {/* Content */}
       <div className="profile-content">
-        <div className="profile-info">
-          <p><span className="label">Department:</span> {department}</p>
-          <p><span className="label">Email:</span> {email}</p>
-          <p><span className="label">Phone:</span> {phone}</p>
+        <h3 className="profile-name">{name}</h3>
+        <p className="profile-role">{role}</p>
+        <span className="profile-department">{department}</span>
+        
+        <div className="profile-contact">
+          <p><strong>Email:</strong> {email}</p>
+          <p><strong>Phone:</strong> {phone}</p>
         </div>
         
-        {/* Fun Fact Section */}
-        <div>
-          <button 
-            onClick={toggleFunFact}
-            className="fun-fact-button"
-          >
-            {showFunFact ? "Hide Fun Fact" : "Show Fun Fact"}
-          </button>
-          
-          {showFunFact && (
-            <div className="fun-fact-container">
-              <p className="fun-fact-text"><span className="label">Fun Fact:</span> {funFact}</p>
-            </div>
-          )}
-        </div>
+        <button 
+          onClick={toggleFunFact}
+          className="fun-fact-button"
+        >
+          {showFunFact ? "Hide Fun Fact" : "Show Fun Fact"}
+        </button>
+        
+        {showFunFact && (
+          <div className="profile-fun-fact">
+            {funFact}
+          </div>
+        )}
       </div>
     </div>
   );
