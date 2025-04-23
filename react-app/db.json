@@ -1,0 +1,59 @@
+{
+  "interns": [
+    {
+      "id": "2",
+      "name": "Samantha Lee",
+      "role": "UI/UX Design Intern",
+      "department": "Design",
+      "email": "samantha.lee@example.com",
+      "phone": "+1 (555) 987-6543",
+      "imageUrl": "https://randomuser.me/api/portraits/women/2.jpg",
+      "funFact": "Speaks four languages fluently!",
+      "joinDate": "2024-02-03"
+    },
+    {
+      "id": "3",
+      "name": "Michael Chen",
+      "role": "Backend Developer Intern",
+      "department": "Engineering",
+      "email": "michael.chen@example.com",
+      "phone": "+1 (555) 456-7890",
+      "imageUrl": "https://randomuser.me/api/portraits/men/3.jpg",
+      "funFact": "National chess champion in college!",
+      "joinDate": "2024-02-22"
+    },
+    {
+      "id": "4",
+      "name": "Priya Patel",
+      "role": "Data Science Intern",
+      "department": "Analytics",
+      "email": "priya.patel@example.com",
+      "phone": "+1 (555) 789-0123",
+      "imageUrl": "https://randomuser.me/api/portraits/women/4.jpg",
+      "funFact": "Climbed Mount Kilimanjaro last summer!",
+      "joinDate": "2024-03-10"
+    },
+    {
+      "id": "5",
+      "name": "James Wilson",
+      "role": "DevOps Intern",
+      "department": "Infrastructure",
+      "email": "james.wilson@example.com",
+      "phone": "+1 (555) 234-5678",
+      "imageUrl": "https://randomuser.me/api/portraits/men/5.jpg",
+      "funFact": "Runs a popular tech podcast in spare time!",
+      "joinDate": "2024-03-25"
+    },
+    {
+      "id": "c546",
+      "name": "sahil kumar",
+      "role": "backend devloper",
+      "department": "Engineering",
+      "email": "sahilkumar23102003@gmail.com",
+      "phone": "8459495467",
+      "imageUrl": "https://randomuser.me/api/portraits/men/80.jpg",
+      "funFact": "hii i am sahil",
+      "joinDate": "2025-04-22"
+    }
+  ]
+}
