@@ -70,8 +70,14 @@ const InternDirectory = () => {
   };
 
   const handleInternSelected = (internId) => {
-    if (internId && typeof internId === 'number') {
-      setSelectedInternId(internId);
+    if (internId) {
+      // Ensure internId is a number
+      const id = Number(internId);
+      if (!isNaN(id)) {
+        setSelectedInternId(id);
+      } else {
+        console.error('Invalid intern ID:', internId);
+      }
     } else {
       console.error('Invalid intern ID:', internId);
     }

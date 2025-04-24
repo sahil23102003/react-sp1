@@ -16,16 +16,16 @@ const InternDetail = ({ internId, onClose }) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         if (!internId) {
           setError("No intern ID provided");
           setLoading(false);
           return;
         }
-        
+
         console.log(`Loading intern details for ID: ${internId}`);
         const response = await fetchInternById(internId);
-        
+
         if (response.status === 200 && response.data) {
           // Add mock data for demo purposes if not already present
           const internData = {
@@ -66,7 +66,7 @@ const InternDetail = ({ internId, onClose }) => {
             techStacks: response.data.techStacks || ['JavaScript', 'React', 'Node.js'],
             assignedProjects: response.data.assignedProjects || []
           };
-          
+
           setIntern(internData);
         } else {
           setError(response.message || 'Failed to load intern details');
@@ -104,7 +104,7 @@ const InternDetail = ({ internId, onClose }) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
     const stars = [];
-    
+
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
         stars.push(<span key={i} className="detail-rating-star">★</span>);
@@ -114,7 +114,7 @@ const InternDetail = ({ internId, onClose }) => {
         stars.push(<span key={i} className="detail-rating-star">☆</span>);
       }
     }
-    
+
     return stars;
   };
 
@@ -161,10 +161,10 @@ const InternDetail = ({ internId, onClose }) => {
       <div className="detail-overlay" onClick={handleOverlayClick}>
         <div className="detail-container">
           <button className="detail-close" onClick={() => setIsEditMode(false)}>×</button>
-          <InternEditForm 
-            intern={intern} 
-            onSave={handleInternUpdated} 
-            onCancel={() => setIsEditMode(false)} 
+          <InternEditForm
+            intern={intern}
+            onSave={handleInternUpdated}
+            onCancel={() => setIsEditMode(false)}
           />
         </div>
       </div>
@@ -180,9 +180,9 @@ const InternDetail = ({ internId, onClose }) => {
     <div className="detail-overlay" onClick={handleOverlayClick}>
       <div className="detail-container">
         <div className="detail-header">
-          <img 
-            src={intern.imageUrl} 
-            alt={`${intern.name}'s profile`} 
+          <img
+            src={intern.imageUrl}
+            alt={`${intern.name}'s profile`}
             className="detail-profile-image"
             onError={(e) => {
               e.target.onerror = null;
@@ -200,7 +200,7 @@ const InternDetail = ({ internId, onClose }) => {
             </div>
           </div>
           <div className="detail-action-buttons">
-            <button 
+            <button
               className="detail-edit-button"
               onClick={() => setIsEditMode(true)}
             >
@@ -248,11 +248,11 @@ const InternDetail = ({ internId, onClose }) => {
               </svg>
               Tech Stacks
             </h3>
-            
+
             {showTechStackForm ? (
-              <TechStackForm 
-                intern={intern} 
-                onTechStackUpdated={handleTechStackUpdated} 
+              <TechStackForm
+                intern={intern}
+                onTechStackUpdated={handleTechStackUpdated}
               />
             ) : (
               <>
@@ -265,8 +265,8 @@ const InternDetail = ({ internId, onClose }) => {
                     <span>No tech stacks added yet</span>
                   )}
                 </div>
-                <button 
-                  className="tech-form-submit" 
+                <button
+                  className="tech-form-submit"
                   style={{ marginTop: '12px' }}
                   onClick={() => setShowTechStackForm(true)}
                 >
@@ -357,7 +357,7 @@ const InternDetail = ({ internId, onClose }) => {
               </div>
             </div>
           </div>
-          
+
           {intern.assignedProjects && intern.assignedProjects.length > 0 && (
             <div className="detail-section">
               <h3 className="detail-section-title">
@@ -367,11 +367,17 @@ const InternDetail = ({ internId, onClose }) => {
                 Assigned Projects
               </h3>
               <div className="assigned-projects-list">
-                {intern.assignedProjects.map(projectId => (
-                  <div key={projectId} className="assigned-project-item">
-                    Project #{projectId}
-                  </div>
-                ))}
+                {intern.assignedProjects.map(project => {
+                  // Check if project is an object or just an ID
+                  const projectId = typeof project === 'object' ? project.id : project;
+                  const projectName = typeof project === 'object' ? project.name : `Project #${project}`;
+
+                  return (
+                    <div key={projectId} className="assigned-project-item">
+                      {projectName}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

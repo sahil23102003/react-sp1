@@ -28,7 +28,12 @@
         }
       ],
       "mentorId": 1,
-      "techStacks": ["JavaScript", "React", "Node.js", "HTML/CSS"],
+      "techStacks": [
+        "JavaScript",
+        "React",
+        "Node.js",
+        "HTML/CSS"
+      ],
       "assignedProjects": [
         {
           "id": 1,
@@ -95,7 +100,12 @@
         }
       ],
       "mentorId": 2,
-      "techStacks": ["Figma", "Adobe XD", "Sketch", "HTML/CSS"],
+      "techStacks": [
+        "Figma",
+        "Adobe XD",
+        "Sketch",
+        "HTML/CSS"
+      ],
       "assignedProjects": [
         {
           "id": 1,
@@ -132,78 +142,47 @@
           }
         ]
       }
+    },
+    {
+      "id": "852f",
+      "name": "sahil kumar",
+      "role": "backend devloper",
+      "department": "Engineering",
+      "email": "sahil.22110647@viit.ac.in",
+      "phone": "8459495467",
+      "imageUrl": "https://randomuser.me/api/portraits/women/42.jpg",
+      "funFact": "",
+      "joinDate": "2025-04-23",
+      "endDate": "2025-10-23",
+      "techStacks": [
+        "Spring Boot"
+      ],
+      "performance": {
+        "rating": "4.0",
+        "sprints": 1,
+        "projects": [],
+        "courses": []
+      },
+      "assignedProjects": [
+        "aee3"
+      ]
     }
   ],
-  "mentors": [
+  "projects": [
     {
-      "id": 1,
-      "name": "David Wong",
-      "role": "Senior Frontend Developer",
-      "department": "Engineering",
-      "email": "david.wong@example.com",
-      "imageUrl": "https://randomuser.me/api/portraits/men/20.jpg"
-    },
-    {
-      "id": 2,
-      "name": "Sarah Miller",
-      "role": "Design Lead",
-      "department": "Design",
-      "email": "sarah.miller@example.com",
-      "imageUrl": "https://randomuser.me/api/portraits/women/20.jpg"
-    },
-    {
-      "id": 3,
-      "name": "Mark Taylor",
-      "role": "Backend Team Lead",
-      "department": "Engineering",
-      "email": "mark.taylor@example.com",
-      "imageUrl": "https://randomuser.me/api/portraits/men/22.jpg"
-    }
-  ],
-  "users": [
-    {
-      "id": 1,
-      "username": "admin",
-      "password": "admin123",
-      "name": "Admin User",
-      "role": "admin",
-      "email": "admin@example.com"
-    },
-    {
-      "id": 2,
-      "username": "mentor1",
-      "password": "mentor123",
-      "name": "David Wong",
-      "role": "mentor",
-      "email": "david.wong@example.com",
-      "mentorId": 1
-    },
-    {
-      "id": 3,
-      "username": "mentor2",
-      "password": "mentor123",
-      "name": "Sarah Miller",
-      "role": "mentor",
-      "email": "sarah.miller@example.com",
-      "mentorId": 2
-    },
-    {
-      "id": 4,
-      "username": "alex",
-      "password": "intern123",
-      "name": "Alex Johnson",
-      "role": "intern",
-      "email": "alex.johnson@example.com",
-      "internId": 1
-    },
-    {
-      "id": 5,
-      "username": "samantha",
-      "password": "intern123",
-      "name": "Samantha Lee",
-      "role": "intern",
-      "email": "samantha.lee@example.com",
-      "internId": 2
+      "id": "aee3",
+      "name": "GymManagement",
+      "description": "gym",
+      "startDate": "2025-04-23",
+      "endDate": "2025-04-27",
+      "requiredPeople": 1,
+      "techStacks": [
+        "Spring Boot",
+        "Flask"
+      ],
+      "assignedInterns": [
+        "852f"
+      ]
     }
   ]
 }

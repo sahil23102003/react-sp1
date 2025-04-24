@@ -64,6 +64,7 @@ export const fetchInterns = async () => {
 };
 
 // GET - Fetch single intern by ID
+// GET - Fetch single intern by ID
 export const fetchInternById = async (id) => {
   if (!id) {
     return {
@@ -74,8 +75,42 @@ export const fetchInternById = async (id) => {
   }
   
   try {
-    const response = await fetch(`${API_URL}/interns/${id}`);
-    return await handleResponse(response, 'Intern fetched successfully');
+    // First log the URL we're trying to fetch
+    const url = `${API_URL}/interns/${id}`;
+    console.log(`Fetching intern from: ${url}`);
+    
+    // Check if we can access the interns list first
+    const listResponse = await fetch(`${API_URL}/interns`);
+    
+    if (!listResponse.ok) {
+      console.error('Could not connect to interns endpoint');
+      return {
+        status: 503,
+        data: null,
+        message: 'Cannot connect to the server. Make sure JSON Server is running.'
+      };
+    }
+    
+    // Get all interns and find the one with matching ID
+    const interns = await listResponse.json();
+    console.log(interns);
+    
+    const intern = interns.find(intern => intern.id === id);
+    
+    if (!intern) {
+      console.error(`Intern with ID ${id} not found in the database`);
+      return {
+        status: 404,
+        data: null,
+        message: 'Intern not found'
+      };
+    }
+    
+    return {
+      status: 200,
+      data: intern,
+      message: 'Intern fetched successfully'
+    };
   } catch (error) {
     console.error('Error fetching intern:', error);
     return {
