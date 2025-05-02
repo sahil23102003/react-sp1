@@ -171,7 +171,7 @@ const InternEditForm = ({ intern, onSave, onCancel }) => {
     setIsSubmitting(true);
     
     try {
-      const response = await updateIntern(intern.id, formData);
+      const response = await updateIntern(intern._id, formData);
       
       if (response.status === 200) {
         // Success!

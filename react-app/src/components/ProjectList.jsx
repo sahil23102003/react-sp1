@@ -99,9 +99,9 @@ const ProjectList = ({ onProjectSelected }) => {
             
             return (
               <div 
-                key={project.id} 
+                key={project._id} 
                 className={`project-card project-status-${status.toLowerCase()}`}
-                onClick={() => handleProjectClick(project.id)}
+                onClick={() => handleProjectClick(project._id)}
               >
                 <div className="project-header">
                   <h3 className="project-name">{project.name}</h3>

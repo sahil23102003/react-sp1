@@ -307,7 +307,7 @@ const InternReports = () => {
                 .sort((a, b) => parseFloat(b.performance.rating) - parseFloat(a.performance.rating))
                 .slice(0, 5)
                 .map(intern => (
-                  <tr key={intern.id}>
+                  <tr key={intern._id}>
                     <td>{intern.name}</td>
                     <td>{intern.department}</td>
                     <td>{intern.performance.rating}</td>

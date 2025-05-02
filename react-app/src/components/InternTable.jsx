@@ -98,7 +98,7 @@ const InternTable = ({ interns, onInternDeleted, onInternSelected, loading }) =>
   // Handle row click to view details
   const handleRowClick = (intern) => {
     if (onInternSelected) {
-      onInternSelected(intern.id);
+      onInternSelected(intern._id);
     }
   };
 
@@ -234,7 +234,7 @@ const InternTable = ({ interns, onInternDeleted, onInternSelected, loading }) =>
               {paginatedInterns.length > 0 ? (
                 paginatedInterns.map((intern) => (
                   <tr 
-                    key={intern.id} 
+                    key={intern._id} 
                     className="clickable-row"
                     onClick={() => handleRowClick(intern)}
                   >
@@ -267,7 +267,7 @@ const InternTable = ({ interns, onInternDeleted, onInternSelected, loading }) =>
                         className="table-action-btn delete"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDelete(intern.id);
+                          handleDelete(intern._id);
                         }}
                       >
                         Delete

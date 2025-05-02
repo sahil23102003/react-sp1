@@ -51,7 +51,7 @@ const TechStackForm = ({ intern, onTechStackUpdated }) => {
         techStacks: selectedTechStacks
       };
       
-      const response = await updateIntern(intern.id, updatedInternData);
+      const response = await updateIntern(intern._id, updatedInternData);
       
       if (response.status === 200) {
         setSuccess(true);

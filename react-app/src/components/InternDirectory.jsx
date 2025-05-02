@@ -71,15 +71,11 @@ const InternDirectory = () => {
 
   const handleInternSelected = (internId) => {
     if (internId) {
-      // Ensure internId is a number
-      const id = Number(internId);
-      if (!isNaN(id)) {
-        setSelectedInternId(id);
-      } else {
-        console.error('Invalid intern ID:', internId);
-      }
+      console.log("Selected Intern ID:", internId); // Add this for debugging
+    
+      setSelectedInternId(internId);
     } else {
-      console.error('Invalid intern ID:', internId);
+      console.error('Invalid intern ID, abhi select hua hai:', internId);
     }
   };
 
@@ -183,6 +179,7 @@ const InternDirectory = () => {
         </div>
       </div>
       
+      
       {showForm && (
         <InternForm onInternAdded={handleInternAdded} />
       )}
@@ -214,7 +211,7 @@ const InternDirectory = () => {
             <div className="interns-grid">
               {interns && interns.length > 0 ? (
                 interns.map((intern) => (
-                  <div key={intern.id} onClick={() => handleInternSelected(intern.id)}>
+                  <div key={intern._id} onClick={() => handleInternSelected(intern._id)}>
                     <ProfileCard
                       name={intern.name}
                       role={intern.role}

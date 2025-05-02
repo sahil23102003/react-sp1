@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
-import { fetchInternById } from '../services/api';
+import { fetchInternById, fetchProjectById } from '../services/api';
 import TechStackForm from './TechStackForm';
 import InternEditForm from './InternEditForm';
 import './InternDetail.css';
 
-const InternDetail = ({ internId, onClose }) => {
+const InternDetail = ({ internId, onClose, onProjectSelected }) => {
   const [intern, setIntern] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showTechStackForm, setShowTechStackForm] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [projectDetails, setProjectDetails] = useState({});
 
   useEffect(() => {
     const loadInternDetails = async () => {
@@ -68,6 +69,30 @@ const InternDetail = ({ internId, onClose }) => {
           };
 
           setIntern(internData);
+          
+          // Fetch project details if there are assigned projects
+          if (internData.assignedProjects && internData.assignedProjects.length > 0) {
+            const projectData = {};
+            
+            // Fetch details for each assigned project
+            const projectPromises = internData.assignedProjects.map(projectId => {
+              // Handle if projectId is an object or string
+              const id = typeof projectId === 'object' ? projectId._id || projectId.id : projectId;
+              return fetchProjectById(id);
+            });
+            
+            const projectResponses = await Promise.all(projectPromises);
+            
+            // Process the responses
+            projectResponses.forEach(projectResponse => {
+              if (projectResponse.status === 200 && projectResponse.data) {
+                const project = projectResponse.data;
+                projectData[project._id] = project;
+              }
+            });
+            
+            setProjectDetails(projectData);
+          }
         } else {
           setError(response.message || 'Failed to load intern details');
         }
@@ -220,10 +245,10 @@ const InternDetail = ({ internId, onClose }) => {
               <p className="detail-metric-value">{intern.performance.sprints}</p>
               <p className="detail-metric-label">Sprints Completed</p>
             </div>
-            <div className="detail-metric-card">
+            {/* <div className="detail-metric-card">
               <p className="detail-metric-value">{intern.performance.projects.length}</p>
               <p className="detail-metric-label">Projects</p>
-            </div>
+            </div> */}
           </div>
 
           <div className="detail-section detail-dates-section">
@@ -265,18 +290,18 @@ const InternDetail = ({ internId, onClose }) => {
                     <span>No tech stacks added yet</span>
                   )}
                 </div>
-                <button
+                {/* <button
                   className="tech-form-submit"
                   style={{ marginTop: '12px' }}
                   onClick={() => setShowTechStackForm(true)}
                 >
                   Edit Tech Stacks
-                </button>
+                </button> */}
               </>
             )}
           </div>
 
-          <div className="detail-section">
+          {/* <div className="detail-section">
             <h3 className="detail-section-title">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -297,9 +322,9 @@ const InternDetail = ({ internId, onClose }) => {
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
 
-          <div className="detail-section">
+          {/* <div className="detail-section">
             <h3 className="detail-section-title">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -329,7 +354,7 @@ const InternDetail = ({ internId, onClose }) => {
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
 
           <div className="detail-section">
             <h3 className="detail-section-title">
@@ -365,16 +390,29 @@ const InternDetail = ({ internId, onClose }) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 Assigned Projects
+                {intern.assignedProjects.length > 0 && Object.keys(projectDetails).length === 0 && (
+                  <small style={{ marginLeft: '8px', fontWeight: 'normal', fontSize: '0.8rem' }}>(Loading...)</small>
+                )}
               </h3>
               <div className="assigned-projects-list">
                 {intern.assignedProjects.map(project => {
-                  // Check if project is an object or just an ID
-                  const projectId = typeof project === 'object' ? project.id : project;
-                  const projectName = typeof project === 'object' ? project.name : `Project #${project}`;
+                  // Get the project ID whether it's an object or string
+                  const projectId = typeof project === 'object' ? project._id || project.id : project;
+                  
+                  // Get the project details from our state
+                  const projectDetail = projectDetails[projectId];
+                  
+                  // Use project name if available, otherwise show ID
+                  const displayName = projectDetail ? projectDetail.name : `Project #${projectId}`;
 
                   return (
-                    <div key={projectId} className="assigned-project-item">
-                      {projectName}
+                    <div 
+                      key={projectId} 
+                      className="assigned-project-item"
+                      onClick={() => projectDetail && onProjectSelected && onProjectSelected(projectId)}
+                      style={{ cursor: projectDetail ? 'pointer' : 'default' }}
+                    >
+                      {displayName}
                     </div>
                   );
                 })}

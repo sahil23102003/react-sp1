@@ -16,11 +16,11 @@ const ProjectDetail = ({ projectId, onClose }) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         if (!projectId) return;
-        
+
         const response = await fetchProjectById(projectId);
-        
+
         if (response.status === 200) {
           setProject(response.data);
         } else {
@@ -41,27 +41,27 @@ const ProjectDetail = ({ projectId, onClose }) => {
   useEffect(() => {
     const loadAvailableInterns = async () => {
       if (!showAssignForm) return;
-      
+
       try {
         const response = await fetchInterns();
-        
+
         if (response.status === 200) {
           // Filter out interns who are already assigned to this project
           const assignedInternIds = project.assignedInterns || [];
-          const availableInternsList = response.data.filter(intern => 
+          const availableInternsList = response.data.filter(intern =>
             // Only include active interns (no end date or end date in the future)
             (!intern.endDate || new Date(intern.endDate) > new Date()) &&
             // Not already assigned to this project
-            !assignedInternIds.includes(intern.id)
+            !assignedInternIds.includes(intern._id)
           );
-          
+
           setAvailableInterns(availableInternsList);
         }
       } catch (err) {
         console.error('Error loading available interns:', err);
       }
     };
-    
+
     loadAvailableInterns();
   }, [showAssignForm, project]);
 
@@ -84,24 +84,24 @@ const ProjectDetail = ({ projectId, onClose }) => {
 
   const handleAssignInterns = async () => {
     if (selectedInterns.length === 0) return;
-    
+
     setIsAssigning(true);
-    
+
     try {
       // Assign each selected intern to the project
       const results = await Promise.all(
-        selectedInterns.map(internId => 
+        selectedInterns.map(internId =>
           assignInternToProject(internId, projectId)
         )
       );
-      
+
       if (results.every(r => r.status === 200)) {
         // Refresh project data
         const response = await fetchProjectById(projectId);
         if (response.status === 200) {
           setProject(response.data);
         }
-        
+
         // Clear selection and hide form
         setSelectedInterns([]);
         setShowAssignForm(false);
@@ -114,13 +114,16 @@ const ProjectDetail = ({ projectId, onClose }) => {
   };
 
   const handleRemoveIntern = async (internId) => {
+
     if (!confirm('Are you sure you want to remove this intern from the project?')) {
       return;
     }
-    
+    const id = typeof internId === 'object' && internId._id ? internId._id : internId;
+    console.log("Removing intern ID:", internId, typeof internId);
+
     try {
-      const response = await removeInternFromProject(internId, projectId);
-      
+      const response = await removeInternFromProject(id, projectId);
+
       if (response.status === 200) {
         // Refresh project data
         const projectResponse = await fetchProjectById(projectId);
@@ -166,14 +169,14 @@ const ProjectDetail = ({ projectId, onClose }) => {
   const now = new Date();
   const startDate = new Date(project.startDate);
   const endDate = project.endDate ? new Date(project.endDate) : null;
-  
+
   let status = 'Active';
   if (startDate > now) {
     status = 'Upcoming';
   } else if (endDate && endDate < now) {
     status = 'Completed';
   }
-  
+
   // Calculate progress for active projects
   let progressPercentage = 0;
   if (status === 'Active' && endDate) {
@@ -203,26 +206,26 @@ const ProjectDetail = ({ projectId, onClose }) => {
               <h3 className="project-section-title">Description</h3>
               <p>{project.description}</p>
             </div>
-            
+
             <div className="project-detail-meta">
               <div className="project-detail-item">
                 <span className="project-detail-label">Start Date:</span>
                 <span className="project-detail-value">{new Date(project.startDate).toLocaleDateString()}</span>
               </div>
-              
+
               <div className="project-detail-item">
                 <span className="project-detail-label">End Date:</span>
                 <span className="project-detail-value">
                   {project.endDate ? new Date(project.endDate).toLocaleDateString() : 'Ongoing'}
                 </span>
               </div>
-              
+
               <div className="project-detail-item">
                 <span className="project-detail-label">Progress:</span>
                 <div className="project-detail-progress">
                   <div className="detail-progress-bar">
-                    <div 
-                      className="detail-progress-fill" 
+                    <div
+                      className="detail-progress-fill"
                       style={{ width: `${progressPercentage}%` }}
                     ></div>
                   </div>
@@ -231,7 +234,7 @@ const ProjectDetail = ({ projectId, onClose }) => {
               </div>
             </div>
           </div>
-          
+
           <div className="project-detail-section">
             <h3 className="project-section-title">Tech Stacks</h3>
             <div className="project-detail-tech-stacks">
@@ -244,11 +247,11 @@ const ProjectDetail = ({ projectId, onClose }) => {
               )}
             </div>
           </div>
-          
+
           <div className="project-detail-section">
             <div className="project-team-header">
               <h3 className="project-section-title">Team Members</h3>
-              <button 
+              <button
                 className="assign-button"
                 onClick={() => setShowAssignForm(!showAssignForm)}
                 disabled={status === 'Completed'}
@@ -256,26 +259,26 @@ const ProjectDetail = ({ projectId, onClose }) => {
                 {showAssignForm ? 'Cancel' : 'Assign Interns'}
               </button>
             </div>
-            
+
             {showAssignForm && (
               <div className="assign-form">
                 <h4 className="assign-form-title">Assign Interns to Project</h4>
-                
+
                 {availableInterns.length === 0 ? (
                   <p className="no-available-interns">No available interns to assign</p>
                 ) : (
                   <>
                     <div className="available-interns-list">
                       {availableInterns.map(intern => (
-                        <div 
-                          key={intern.id}
-                          className={`available-intern-item ${selectedInterns.includes(intern.id) ? 'selected' : ''}`}
-                          onClick={() => handleInternToggle(intern.id)}
+                        <div
+                          key={intern._id}
+                          className={`available-intern-item ${selectedInterns.includes(intern._id) ? 'selected' : ''}`}
+                          onClick={() => handleInternToggle(intern._id)}
                         >
-                          <input 
+                          <input
                             type="checkbox"
-                            checked={selectedInterns.includes(intern.id)}
-                            onChange={() => {}}
+                            checked={selectedInterns.includes(intern._id)}
+                            onChange={() => { }}
                             readOnly
                           />
                           <div className="available-intern-info">
@@ -285,7 +288,7 @@ const ProjectDetail = ({ projectId, onClose }) => {
                         </div>
                       ))}
                     </div>
-                    
+
                     <div className="assign-form-actions">
                       <button
                         className="assign-submit-button"
@@ -299,28 +302,31 @@ const ProjectDetail = ({ projectId, onClose }) => {
                 )}
               </div>
             )}
-            
+
             <div className="team-list">
               {project.assignedInterns && project.assignedInterns.length > 0 ? (
                 project.assignedInterns.map(internId => {
                   // Look up intern details in the available interns list
-                  const internDetail = availableInterns.find(i => i.id === internId);
-                  
+                  const internDetail = availableInterns.find(i => i._id === internId);
+
                   return (
                     <div key={internId} className="team-member">
                       <div className="team-member-info">
                         <div className="team-member-name">
-                          {internDetail ? internDetail.name : `Intern #${internId}`}
+                          {internDetail ? internDetail.name :
+                            (typeof internId === 'object' && internId.name ?
+                              internId.name :
+                              `Intern #${typeof internId === 'object' ? internId._id : internId}`)}
                         </div>
                         {internDetail && (
                           <div className="team-member-role">{internDetail.role}</div>
                         )}
                       </div>
-                      
+
                       {status !== 'Completed' && (
-                        <button 
+                        <button
                           className="remove-intern-button"
-                          onClick={() => handleRemoveIntern(internId)}
+                          onClick={() => handleRemoveIntern(internId._id)}
                         >
                           Remove
                         </button>
@@ -332,7 +338,7 @@ const ProjectDetail = ({ projectId, onClose }) => {
                 <p className="no-team-members">No team members assigned yet</p>
               )}
             </div>
-            
+
             <div className="team-summary">
               <span className="team-count">
                 {project.assignedInterns?.length || 0} / {project.requiredPeople} positions filled
